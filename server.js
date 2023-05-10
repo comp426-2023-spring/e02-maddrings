@@ -43,6 +43,7 @@ import express from 'express'
 // https://flaviocopes.com/fix-dirname-not-defined-es-module-scope/
 import path from 'path'
 import { fileURLToPath } from 'url'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 // Load dependencies for logging
@@ -62,7 +63,7 @@ const app = express()
 // Set a port for the server to listen on
 const port = args.port || args.p || process.env.PORT || 8080
 // Load app middleware here to serve routes, accept data requests, etc.
-//
+
 // Create and update access log
 // The morgan format below is the Apache Foundation combined format but with ISO8601 dates
 app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"',
@@ -102,3 +103,52 @@ process.on('SIGINT', () => {
         }    
     })
 })
+
+import { rps, rpsls } from './lib/rpsls.js'
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));    
+
+app.get('/app/', (req, res) => {     
+    res.status(200).send("200 OK")
+})
+
+app.get('/app/rps/', (req, res) => {     
+    res.status(200).send(rps(null));
+})
+
+app.get('/app/rpsls/', (req, res) => {   
+    res.status(200).send(rpsls(null));
+})
+
+app.get('/app/rps/play/', (req, res) => {   
+    res.status(200).send(rps(req.query.shot));
+})
+
+app.post('/app/rps/play/', (req, res) => {   
+    res.status(200).send(rps(req.body.shot));
+})
+
+app.get('/app/rpsls/play/', (req, res) => {   
+    res.status(200).send(rpsls(req.query.shot));
+})
+
+app.post('/app/rpsls/play/', (req, res) => {   
+    res.status(200).send(rpsls(req.body.shot));
+})
+
+app.get('/app/rps/play/:shot/', (req, res) => {     
+    res.status(200).send(rps(req.params.shot));
+})
+
+app.get('/app/rpsls/play/:shot/', (req, res) => {   
+    res.status(200).send(rpsls(req.params.shot));
+})
+
+app.get('*', (req, res) => {
+    res.status(404).send('404 NOT FOUND')
+})
+
+// app.listen(port, () => {
+//     console.log(`Server listening on port ${port}`);
+// });
